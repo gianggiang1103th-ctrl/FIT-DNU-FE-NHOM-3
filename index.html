@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!-- Project: QuizMaster - Developed by NHÓM 3-FIT-DNU -->
+<html lang="vi" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizMaster - Hệ thống ngân hàng câu hỏi & Luyện thi trực tuyến</title>
+  
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Fullscreen Global Loading Spinner -->
+  <div id="globalSpinner">
+    <div class="spinner-logo">QuizMaster</div>
+    <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status"></div>
+    <div class="text-white mt-3 fw-bold">Đang kết nối hệ thống, vui lòng chờ...</div>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#" id="brandLogo">
+        <span class="fs-3">⚡</span>
+        <span class="ms-2">QuizMaster</span>
+      </a>
+      
+      <!-- Mobile Toggle Button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Navigation Links (Only shown when logged in) -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-bold gap-1" id="mainNavLinks" style="display: none;">
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="navLeaderboardBtn">🏆 Bảng Xếp Hạng</a>
+          </li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0 ms-auto">
+          <!-- Dark Mode Toggle Button -->
+          <button id="themeToggleBtn" class="btn btn-outline-dark btn-sm">
+            🌙 <span class="d-none d-md-inline ms-1">Giao diện Tối</span>
+          </button>
+          
+          <!-- Authentication Context Area -->
+          <div id="authContextZone" class="d-flex gap-2">
+            <!-- Loading state placeholder -->
+            <button class="btn btn-secondary btn-sm placeholder col-4" disabled></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="container py-4">
+
+    <!-- 1. Home / Topic Selection View -->
+    <section id="homeView" class="view-section">
+      <!-- Hero Banner -->
+      <div class="hero-section text-center">
+        <h1 class="display-4 fw-extrabold mb-3">Luyện thi trắc nghiệm trực tuyến chuyên nghiệp</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 800px;">
+          Nâng cao kiến thức và tự tin chinh phục các kỳ thi với ngân hàng câu hỏi đa dạng, được cập nhật liên tục. Trải nghiệm thi thử mượt mà giống như thi thật.
+        </p>
+        <hr class="my-4 mx-auto style-two" style="width: 100px; border-top: 3px solid var(--primary-color);">
+        <p class="text-secondary small fw-semibold">
+          KHOA CNTT - DNU - NHÓM 3-FIT-DNU
+        </p>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="row g-4">
+        <!-- Topics List (col-12 Full Width) -->
+        <div class="col-12">
+          <h2 class="h3 fw-bold border-start border-4 border-primary ps-3 mb-1">Danh sách Chủ đề thi</h2>
+          <p class="text-muted mb-4">Chọn một chủ đề dưới đây để bắt đầu làm bài thi thử nghiệm.</p>
+          
+          <div id="topicsGrid" class="row g-4">
+            <!-- Render placeholder cards initially -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card custom-card p-4 placeholder-glow">
+                <span class="placeholder col-7 mb-3" style="height: 25px;"></span>
+                <span class="placeholder col-12 mb-2"></span>
+                <span class="placeholder col-9 mb-4"></span>
+                <span class="placeholder col-6 btn" style="height: 38px;"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.25. Global Leaderboard View (Hidden by default) -->
+    <section id="leaderboardView" class="view-section d-none">
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="bg-body-secondary p-4 rounded-4 shadow-sm d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+              <h2 class="h3 fw-bold mb-1">🏆 Bảng Xếp Hạng Cao Thủ</h2>
+              <p class="text-muted mb-0">Vinh danh Top 5 học sinh có Điểm số trung bình tích lũy cao nhất hệ thống.</p>
+            </div>
+            <button id="backToHomeFromLeaderboardBtn" class="btn btn-outline-primary fw-bold">🏠 Về Trang Chủ</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <div class="card custom-card p-4 shadow-sm border border-warning-subtle" style="background: linear-gradient(180deg, var(--card-bg) 0%, rgba(245,158,11,0.02) 100%);">
+            <h3 class="h5 fw-bold mb-3 border-bottom pb-2 text-warning d-flex align-items-center justify-content-between">
+              <span>🏆 Top 5 Cao Thủ Tích Lũy</span>
+              <span class="badge bg-warning text-dark small fw-bold">QuizMaster</span>
+            </h3>
+            <div id="leaderboardList" class="d-flex flex-column gap-3">
+              <!-- Loading placeholder for leaderboard -->
+              <div class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
+                <div class="small mt-1">Đang xếp hạng cao thủ...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.5. User Account / Profile View (Hidden by default) -->
+    <section id="profileView" class="view-section d-none">
+      <!-- Premium Profile Card -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card custom-card p-4 shadow-sm border-0" style="background: linear-gradient(135deg, var(--card-bg) 0%, rgba(79, 70, 229, 0.04) 100%);">
+            <div class="d-flex align-items-center gap-4 flex-wrap flex-md-nowrap">
+              <div class="profile-avatar-circle d-flex justify-content-center align-items-center rounded-circle text-white fw-bold fs-1 shadow-lg" 
+                   style="width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); min-width: 90px;">
+                <span id="profileAvatarChar">U</span>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                  <h2 id="profileFullName" class="h3 fw-bold mb-0 text-main">Tên Người Dùng</h2>
+                  <span id="profileRoleBadge" class="badge bg-primary text-capitalize py-1 px-2.5">Học sinh</span>
+                </div>
+                <p class="text-muted mb-3 font-monospace">@<span id="profileUsername">username</span></p>
+                <div class="d-flex gap-3 flex-wrap">
+                  <div class="bg-body-secondary py-2 px-3 rounded-3 text-center">
+                    <span class="d-block text-secondary small" style="font-size: 0.75rem;">Bài đã thi</span>
+                    <strong id="profileTestCount" class="h5 fw-bold mb-0">0</strong>
+                  </div>
+                  <div class="bg-body-secondary py-2 px-3 rounded-3 text-center">
+                    <span class="d-block text-secondary small" style="font-size: 0.75rem;">Điểm trung bình</span>
+                    <strong id="profileAvgScore" class="h5 fw-bold mb-0">0.0</strong>
+                  </div>
+                  <div class="bg-body-secondary py-2 px-3 rounded-3 text-center">
+                    <span class="d-block text-secondary small" style="font-size: 0.75rem;">Xếp hạng hệ thống</span>
+                    <strong id="profileRankDisplay" class="h5 fw-bold mb-0">--</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="ms-md-auto align-self-start no-print">
+                <button id="backToHomeFromProfileBtn" class="btn btn-outline-primary fw-bold px-3">🏠 Về Trang Chủ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- History Table (col-lg-7) -->
+        <div class="col-lg-7">
+          <div class="card custom-card p-4 shadow-sm" style="min-height: 480px;">
+            <h3 class="h5 fw-bold mb-3 border-bottom pb-2 text-primary">📂 Lịch sử làm bài chi tiết</h3>
+            <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th>Ngày thi</th>
+                    <th>Chủ đề</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Thời gian</th>
+                    <th class="text-center">Điểm số</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                  <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                      Bạn chưa hoàn thành bài thi trắc nghiệm nào!
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart.js Analytics (col-lg-5) -->
+        <div class="col-lg-5">
+          <div class="card custom-card p-4 shadow-sm d-flex flex-column" style="min-height: 480px;">
+            <h3 class="h5 fw-bold mb-3 border-bottom pb-2 text-primary">📈 Biểu đồ điểm số tích lũy</h3>
+            <div class="flex-grow-1 d-flex align-items-center justify-content-center" style="position: relative; height: 320px; width: 100%;">
+              <canvas id="performanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Quiz / Examination View (Hidden by default) -->
+    <section id="quizView" class="view-section d-none">
+      <!-- Exam Sticky Header -->
+      <div class="row mb-4 align-items-center bg-body-secondary p-3 rounded-4 shadow-sm">
+        <div class="col-md-7">
+          <h2 id="quizTopicTitle" class="h4 fw-bold mb-1">Tên chủ đề thi</h2>
+          <p id="quizTopicDesc" class="text-muted small mb-0">Mô tả chi tiết chủ đề thi...</p>
+        </div>
+        <div class="col-md-5 d-flex justify-content-md-end mt-3 mt-md-0">
+          <!-- Countdown Timer Widget -->
+          <div class="timer-container" id="timerWidget">
+            <span>⏱️ Thời gian:</span>
+            <span id="countdownDisplay" class="font-monospace text-primary">00:00</span>
+          </div>
+        </div>
+        <!-- Progress Bar for remaining time -->
+        <div class="col-12 mt-3">
+          <div class="progress" style="height: 6px;">
+            <div id="timeProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Workspace -->
+      <div class="row g-4">
+        <!-- Column Right: Questions List -->
+        <div class="col-lg-9 order-1 order-lg-1">
+          <div id="questionsContainer" class="d-flex flex-column gap-4">
+            <!-- Questions will be loaded dynamically here -->
+          </div>
+          
+          <!-- Submit Button at the bottom of the list -->
+          <div class="text-center mt-5 mb-4">
+            <button id="submitQuizBottomBtn" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold">
+              ✓ Nộp Bài Thi Ngay
+            </button>
+          </div>
+        </div>
+
+        <!-- Column Left: Question Palette Navigator -->
+        <div class="col-lg-3 order-0 order-lg-2">
+          <div class="card question-nav-container custom-card p-3 sticky-top">
+            <h3 class="h6 fw-bold mb-3 border-bottom pb-2">Bảng điều hướng câu hỏi</h3>
+            <div id="questionPalette" class="d-flex flex-wrap gap-2 mb-4">
+              <!-- Round badge buttons for navigation will be rendered here -->
+            </div>
+            
+            <hr>
+            
+            <!-- Context Button inside Palette -->
+            <button id="submitQuizPaletteBtn" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">
+              ✓ Nộp Bài
+            </button>
+            <button id="exitQuizBtn" class="btn btn-outline-secondary w-100 fw-bold py-2 mt-2 d-none">
+              ✕ Thoát Xem Lại
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== AUTH MODALS ==================== -->
+
+  <!-- A. Login Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="loginModalLabel">Đăng nhập tài khoản</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="loginForm">
+          <div class="modal-body p-4">
+            <div id="loginErrorMsg" class="alert alert-danger d-none" role="alert"></div>
+            
+            <div class="mb-3">
+              <label for="loginUsername" class="form-label fw-semibold">Tên đăng nhập (Username)</label>
+              <input type="text" class="form-control" id="loginUsername" placeholder="Nhập tên đăng nhập của bạn" required autocomplete="username">
+            </div>
+            
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label fw-semibold">Mật khẩu</label>
+              <input type="password" class="form-control" id="loginPassword" placeholder="Nhập mật khẩu của bạn" required autocomplete="current-password">
+            </div>
+          </div>
+          <div class="modal-footer p-3 bg-light">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+            <button type="submit" class="btn btn-primary btn-sm px-4">Đăng nhập</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. Register Modal -->
+  <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold" id="registerModalLabel">Đăng ký tài khoản mới</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="registerForm">
+          <div class="modal-body p-4">
+            <div id="registerErrorMsg" class="alert alert-danger d-none" role="alert"></div>
+            
+            <div class="mb-3">
+              <label for="registerFullName" class="form-label fw-semibold">Họ và Tên</label>
+              <input type="text" class="form-control" id="registerFullName" placeholder="Nhập đầy đủ họ và tên" required autocomplete="name">
+            </div>
+            
+            <div class="mb-3">
+              <label for="registerUsername" class="form-label fw-semibold">Tên đăng nhập (Username)</label>
+              <input type="text" class="form-control" id="registerUsername" placeholder="Nhập tên tài khoản mong muốn" required autocomplete="username">
+            </div>
+            
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label fw-semibold">Mật khẩu</label>
+              <input type="password" class="form-control" id="registerPassword" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required autocomplete="new-password">
+            </div>
+          </div>
+          <div class="modal-footer p-3 bg-light">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+            <button type="submit" class="btn btn-success btn-sm px-4">Đăng ký</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EXAM RESULTS MODAL ==================== -->
+  <div class="modal fade" id="scoreReportModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="scoreReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-bold w-100 text-center" id="scoreReportModalLabel">KẾT QUẢ THI CỦA BẠN</h5>
+        </div>
+        <div class="modal-body p-5 text-center">
+          <p class="text-secondary small mb-2 uppercase fw-bold tracking-wider">Điểm số đạt được</p>
+          
+          <!-- Circular styled score display -->
+          <div class="d-inline-flex justify-content-center align-items-center bg-primary-subtle text-primary rounded-circle border border-primary border-4 mb-4 shadow" style="width: 140px; height: 140px;">
+            <div class="text-center">
+              <span id="reportScore" class="display-4 fw-bold">10.0</span>
+              <div class="small fw-semibold mt-n2">thang 10</div>
+            </div>
+          </div>
+
+          <h4 id="reportTitle" class="fw-bold mb-3 text-success">Tuyệt vời!</h4>
+          
+          <div class="row g-3 justify-content-center mt-2">
+            <div class="col-6 col-sm-4">
+              <div class="bg-body-secondary p-3 rounded-3 shadow-xs">
+                <div class="text-secondary small mb-1">Số câu đúng</div>
+                <div id="reportCorrectCount" class="h5 fw-bold mb-0">15/20</div>
+              </div>
+            </div>
+            <div class="col-6 col-sm-4">
+              <div class="bg-body-secondary p-3 rounded-3 shadow-xs">
+                <div class="text-secondary small mb-1">Thời gian làm</div>
+                <div id="reportTimeSpent" class="h5 fw-bold mb-0">05:43</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer p-3 bg-light justify-content-center gap-2">
+          <button id="getCertificateBtn" class="btn btn-warning px-4 fw-bold text-dark d-none" data-bs-dismiss="modal">
+            🎓 Nhận Chứng Chỉ
+          </button>
+          <button id="viewQuizReviewBtn" class="btn btn-success px-4 fw-semibold" data-bs-dismiss="modal">
+            👁 Xem lại câu sai
+          </button>
+          <button id="backToHomeBtn" class="btn btn-secondary px-4 fw-semibold" data-bs-dismiss="modal">
+            🏠 Về trang chủ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CERTIFICATE OVERLAY ==================== -->
+  <div id="certificateOverlay" class="certificate-overlay d-none">
+    <div class="certificate-container">
+      <div class="certificate-frame">
+        <div class="certificate-header">
+          <div class="certificate-seal">FIT-DNU</div>
+          <h1 class="certificate-title">CHỨNG NHẬN HOÀN THÀNH</h1>
+          <p class="certificate-subtitle">Hệ thống Luyện thi Trắc nghiệm trực tuyến QuizMaster</p>
+        </div>
+        
+        <div class="certificate-body text-center">
+          <p class="cert-text-small">Chứng nhận này được trân trọng trao tặng cho</p>
+          <h2 class="certificate-name" id="certStudentName">Học Viên Xuất Sắc</h2>
+          <p class="cert-text-small">vì đã hoàn thành xuất sắc chủ đề luyện thi trực tuyến</p>
+          <h3 class="certificate-topic" id="certTopicName">Lập trình Web Cơ bản</h3>
+          <p class="cert-text-small">với số điểm thi ấn tượng đạt được</p>
+          <div class="certificate-score" id="certScore">10.0 / 10.0</div>
+        </div>
+        
+        <div class="certificate-footer d-flex justify-content-between align-items-end mt-4">
+          <div class="cert-signature-block text-center" style="width: 200px;">
+            <div class="cert-signature fs-5 fw-bold text-primary">NHÓM 3 - FIT</div>
+            <div class="cert-line" style="border-top: 1.5px solid var(--text-main); margin: 5px auto; width: 150px;"></div>
+            <p class="cert-text-small text-muted mb-0">Hội đồng Khảo thí FIT-DNU</p>
+          </div>
+          <div class="cert-date-block text-center" style="width: 200px;">
+            <div class="cert-date fs-6 fw-bold" id="certDate">28/05/2026</div>
+            <div class="cert-line" style="border-top: 1.5px solid var(--text-main); margin: 5px auto; width: 150px;"></div>
+            <p class="cert-text-small text-muted mb-0">Ngày cấp chứng nhận</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Print/Action buttons -->
+    <div class="certificate-actions text-center mt-4 no-print">
+      <button id="printCertBtn" class="btn btn-warning btn-lg fw-bold px-4 shadow">🖨️ In & Tải Xuống PDF</button>
+      <button id="closeCertBtn" class="btn btn-outline-light btn-lg fw-bold px-4 ms-2">✕ Đóng Lại</button>
+    </div>
+  </div>
+
+  <!-- Third-party CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Bootstrap 5 Bundle with Popper JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Application Core Modules -->
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
