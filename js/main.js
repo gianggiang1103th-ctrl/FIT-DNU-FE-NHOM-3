@@ -950,29 +950,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Đăng ký sự kiện cho các Mock Link thông tin bổ sung trong Sidebar
-  const mockLinks = [
-    { id: 'sidebarAboutBtn', name: 'Giới thiệu Khoa & Nhóm 3 (Về Chúng Tôi)' },
-    { id: 'sidebarBlogBtn', name: 'Tin tức Giáo dục & Tài liệu ôn thi (Blog)' },
-    { id: 'sidebarContactBtn', name: 'Hỗ trợ Kỹ thuật & Liên hệ (Liên Hệ)' }
-  ];
+  // Đăng ký sự kiện click thực tế cho các liên kết bổ sung trong Sidebar
+  const sidebarAboutBtn = document.getElementById('sidebarAboutBtn');
+  if (sidebarAboutBtn) {
+    sidebarAboutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
+      sidebarAboutBtn.classList.add('active');
+      closeSidebar();
+      showTab('about');
+    });
+  }
 
-  mockLinks.forEach(link => {
-    const el = document.getElementById(link.id);
-    if (el) {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
-        el.classList.add('active');
-        
-        closeSidebar();
-        
-        // Thông báo mock cao cấp
-        alert(`🌟 Chào mừng bạn đến với mục: ${link.name}!\n\nHệ thống ôn thi trực tuyến QuizMaster đang tiến hành đồng bộ tài nguyên từ máy chủ FIT-DNU.\n\nCảm ơn bạn đã đồng hành cùng Nhóm 3 - FIT - DNU!`);
-      });
-    }
-  });
+  const sidebarBlogBtn = document.getElementById('sidebarBlogBtn');
+  if (sidebarBlogBtn) {
+    sidebarBlogBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
+      sidebarBlogBtn.classList.add('active');
+      closeSidebar();
+      showTab('news');
+    });
+  }
+
+  const sidebarContactBtn = document.getElementById('sidebarContactBtn');
+  if (sidebarContactBtn) {
+    sidebarContactBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
+      sidebarContactBtn.classList.add('active');
+      closeSidebar();
+      showTab('contact');
+    });
+  }
 
   // Đăng ký sự kiện cho Chân trang (Footer)
   const footerHomeBtn = document.getElementById('footerHomeBtn');
@@ -1057,6 +1067,14 @@ document.addEventListener('DOMContentLoaded', () => {
     profileView.classList.add('d-none');
     quizView.classList.add('d-none');
 
+    // Ẩn 3 view mới
+    const aboutView = document.getElementById('aboutView');
+    const newsView = document.getElementById('newsView');
+    const contactView = document.getElementById('contactView');
+    if (aboutView) aboutView.classList.add('d-none');
+    if (newsView) newsView.classList.add('d-none');
+    if (contactView) contactView.classList.add('d-none');
+
     if (tabName === 'home') {
       homeView.classList.remove('d-none');
       loadTopics();
@@ -1067,6 +1085,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (tabName === 'profile') {
       profileView.classList.remove('d-none');
       renderUserProfile();
+    } else if (tabName === 'about') {
+      if (aboutView) aboutView.classList.remove('d-none');
+    } else if (tabName === 'news') {
+      if (newsView) newsView.classList.remove('d-none');
+      renderNewsList('', 'all'); // Gọi render động toàn bộ danh sách lúc đầu
+    } else if (tabName === 'contact') {
+      if (contactView) contactView.classList.remove('d-none');
     }
     window.scrollTo(0, 0);
   }
@@ -1327,6 +1352,180 @@ document.addEventListener('DOMContentLoaded', () => {
       window.print();
     });
   }
+
+  // ==================== 8. MÔ-ĐUN PHÂN HỆ MỚI: ABOUT, NEWS, CONTACT ====================
+
+  // A. Dữ liệu Tin tức & Tài liệu học thuật QuizMaster
+  const NEWS_DATA = [
+    {
+      id: 'news-1',
+      tag: 'tailieu',
+      tagName: 'Tài liệu ôn tập',
+      title: 'Đề cương ôn tập Lập trình Web nâng cao - FIT-DNU',
+      description: 'Tổng hợp 150 câu hỏi trắc nghiệm ôn luyện lý thuyết HTML5, CSS3 Grid/Flexbox, Javascript ES6 và thực hành thao tác trên DOM. Tài liệu phát hành chính thức bởi Nhóm 3 môn học thiết kế Front-End.',
+      date: '01/06/2026',
+      readTime: '6 phút đọc'
+    },
+    {
+      id: 'news-2',
+      tag: 'meobai',
+      tagName: 'Mẹo làm bài',
+      title: 'Bí quyết đạt điểm tối đa trong kỳ thi trắc nghiệm lập trình',
+      description: 'Cẩm nang hướng dẫn cách loại trừ phương án sai nhanh chóng, mẹo đọc hiểu câu hỏi bẫy và cách phân bổ thời gian làm bài trắc nghiệm thông minh trong 45 phút môn Thiết kế Web.',
+      date: '28/05/2026',
+      readTime: '4 phút đọc'
+    },
+    {
+      id: 'news-3',
+      tag: 'thongbao',
+      tagName: 'Thông báo',
+      title: 'Kế hoạch bổ sung 200 câu hỏi trắc nghiệm tháng 6/2026',
+      description: 'Ban học thuật khoa Công nghệ thông tin DNU sẽ tiến hành cập nhật ngân hàng đề thi thử các môn Lập trình C#, Cơ sở dữ liệu quan hệ, và Thiết kế giao diện Front-End.',
+      date: '25/05/2026',
+      readTime: '2 phút đọc'
+    },
+    {
+      id: 'news-4',
+      tag: 'tailieu',
+      tagName: 'Tài liệu ôn tập',
+      title: 'Tóm tắt toàn bộ cú pháp CSS Flexbox & CSS Grid cực dễ nhớ',
+      description: 'Tài liệu cheat-sheet trực quan sinh động dành riêng cho sinh viên DNU ôn luyện chuẩn bị cho kỳ thi thực hành Front-End cuối kỳ môn học thiết kế Web.',
+      date: '20/05/2026',
+      readTime: '5 phút đọc'
+    }
+  ];
+
+  // B. Hàm đổ danh sách tài liệu ôn tập
+  function renderNewsList(searchQuery = '', selectedTag = 'all') {
+    const grid = document.getElementById('newsListGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    
+    const filtered = NEWS_DATA.filter(news => {
+      const matchQuery = news.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          news.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchTag = selectedTag === 'all' || news.tag === selectedTag;
+      return matchQuery && matchTag;
+    });
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="col-12 text-center py-5 text-muted bg-body-secondary rounded-4 border">
+          <i class="bi bi-search display-6 mb-3 d-block text-primary"></i>
+          <span class="fw-bold d-block mb-1">Không tìm thấy tài liệu phù hợp!</span>
+          <span class="small text-secondary">Hãy thử lại với từ khóa khác như "HTML5", "Mẹo", "Web"...</span>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(news => {
+      const badgeClass = news.tag === 'tailieu' ? 'badge-tailieu' : (news.tag === 'meobai' ? 'badge-meobai' : 'badge-thongbao');
+      const col = document.createElement('div');
+      col.className = 'col-md-6';
+      col.innerHTML = `
+        <div class="card custom-card p-4 h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="news-badge ${badgeClass}">${news.tagName}</span>
+            <span class="text-secondary small font-monospace">${news.date}</span>
+          </div>
+          <h3 class="h5 fw-bold mb-2 text-main">${escapeHTML(news.title)}</h3>
+          <p class="text-secondary small flex-grow-1 mb-4 leading-relaxed">${escapeHTML(news.description)}</p>
+          <div class="border-top pt-3 mt-auto d-flex justify-content-between align-items-center small text-secondary">
+            <span>⏱️ ${news.readTime}</span>
+            <button class="btn btn-outline-primary btn-sm px-3 fw-bold view-news-btn" data-id="${news.id}">
+              Đọc tài liệu »
+            </button>
+          </div>
+        </div>
+      `;
+      grid.appendChild(col);
+    });
+
+    // Bắt sự kiện đọc tài liệu ôn tập
+    grid.querySelectorAll('.view-news-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const newsId = e.target.getAttribute('data-id');
+        const newsItem = NEWS_DATA.find(n => n.id === newsId);
+        if (newsItem) {
+          alert(`📖 [TÀI LIỆU HỌC TẬP — FIT-DNU]\n\nTiêu đề: ${newsItem.title}\nChuyên mục: ${newsItem.tagName}\nNgày cập nhật: ${newsItem.date}\n\nNội dung chi tiết tài liệu đã được đồng bộ trực tuyến. Bạn có thể tải toàn bộ PDF đề cương học tập tại hòm thư DNU cá nhân của mình!\n\nChúc các bạn sinh viên Nhóm 3 đạt kết quả thật cao!`);
+        }
+      });
+    });
+  }
+
+  // C. Lắng nghe hộp tìm kiếm tin tức thời gian thực
+  const newsSearchInput = document.getElementById('newsSearchInput');
+  if (newsSearchInput) {
+    newsSearchInput.addEventListener('input', (e) => {
+      const query = e.target.value;
+      const activeTagBtn = document.querySelector('#newsTagFilters .tag-filter-btn.active');
+      const tag = activeTagBtn ? activeTagBtn.getAttribute('data-tag') : 'all';
+      renderNewsList(query, tag);
+    });
+  }
+
+  // D. Lắng nghe các nút Tag lọc tin tức
+  document.querySelectorAll('#newsTagFilters .tag-filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Toggle CSS active
+      document.querySelectorAll('#newsTagFilters .tag-filter-btn').forEach(b => {
+        b.classList.remove('btn-primary', 'active');
+        b.classList.add('btn-outline-primary');
+      });
+      btn.classList.remove('btn-outline-primary');
+      btn.classList.add('btn-primary', 'active');
+
+      const tag = btn.getAttribute('data-tag');
+      const query = newsSearchInput ? newsSearchInput.value : '';
+      renderNewsList(query, tag);
+    });
+  });
+
+  // E. Lắng nghe trình xử lý gửi Form liên hệ phản hồi
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('contactName').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const subject = document.getElementById('contactSubject').value;
+      const message = document.getElementById('contactMessage').value.trim();
+
+      if (!name || !email || !subject || !message) {
+        alert('Vui lòng điền đầy đủ các trường thông tin bắt buộc có dấu sao đỏ!');
+        return;
+      }
+
+      // Phát âm thanh Ting thành công
+      if (window.QuizAudio) {
+        window.QuizAudio.playSuccess();
+      }
+
+      // Pháo hoa giấy Confetti rực rỡ
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      }
+
+      alert(`✉️ [GỬI PHẢN HỒI THÀNH CÔNG]\n\nChào bạn ${name},\n\nYêu cầu hỗ trợ về môn học đã được gửi tới Ban học tập khoa CNTT - DNU thành công.\n\nNhóm 3 sẽ xem xét và phản hồi sớm nhất tới địa chỉ hòm thư ${email} của bạn trong vòng 24 giờ.\n\nCảm ơn bạn đã đóng góp ý kiến xây dựng hệ thống QuizMaster!`);
+      
+      contactForm.reset();
+    });
+  }
+
+  // F. Đăng ký cho tất cả các nút back-to-home-btn
+  document.querySelectorAll('.back-to-home-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      goBackToHome();
+    });
+  });
 
   // ==================== TIỆN ÍCH HỖ TRỢ ====================
   
