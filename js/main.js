@@ -29,16 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ==================== 1. QUẢN LÝ PHIÊN ĐĂNG NHẬP & AUTH UI ====================
   
-  // Khởi tạo trạng thái Đăng nhập/Đăng ký trên Navbar
+  // Khởi tạo trạng thái Đăng nhập/Đăng ký trên Navbar và Sidebar Offcanvas mới
   function renderAuthContext() {
     const currentUser = window.QuizSession.get();
     const mainNavLinks = document.getElementById('mainNavLinks');
     
+    // Elements của Sidebar mới
+    const sidebarLoginItem = document.getElementById('sidebarLoginItem');
+    const sidebarAdminItem = document.getElementById('sidebarAdminItem');
+    const sidebarAuthBtnZone = document.getElementById('sidebarAuthBtnZone');
+    
     if (currentUser) {
-      // Hiện menu Thống kê & Lịch sử
+      // --- PHẦN LOGIC NAVBAR CŨ (Duy trì tính tương thích) ---
       if (mainNavLinks) mainNavLinks.style.display = 'flex';
-      
-      // Đã đăng nhập
       const adminLink = currentUser.role === 'admin' 
         ? `<a href="admin.html" class="btn btn-warning btn-sm fw-bold">⚙ Quản trị viên</a>` 
         : '';
@@ -54,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      // Lắng nghe sự kiện click vào tên tài khoản để chuyển sang Trang Cá Nhân
       const profileLink = document.getElementById('navbarProfileLink');
       if (profileLink) {
         profileLink.addEventListener('click', (e) => {
@@ -63,23 +65,114 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
       
-      // Lắng nghe sự kiện đăng xuất
-      document.getElementById('logoutBtn').addEventListener('click', () => {
-        window.QuizSession.clear();
-        renderAuthContext();
-        loadTopics(); // Tải lại để các nút "Bắt đầu" cập nhật hành vi
-        // Nếu đang trong phòng thi, đẩy ra trang chủ
-        goBackToHome();
-      });
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          window.QuizSession.clear();
+          renderAuthContext();
+          loadTopics();
+          goBackToHome();
+        });
+      }
+
+      // --- PHẦN LOGIC SIDEBAR MỚI (Mockup Design) ---
+      // 1. Thay thế mục Đăng nhập thành tên chào User dẫn đến Profile
+      if (sidebarLoginItem) {
+        sidebarLoginItem.innerHTML = `
+          <a class="nav-link sidebar-link d-flex align-items-center gap-3" href="#" id="sidebarProfileBtn">
+            <i class="bi bi-person-circle fs-5 icon-orange"></i>
+            <span class="text-truncate">Chào, <strong class="text-primary">${escapeHTML(currentUser.fullName)}</strong></span>
+          </a>
+        `;
+        const sidebarProfileBtn = document.getElementById('sidebarProfileBtn');
+        if (sidebarProfileBtn) {
+          sidebarProfileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeSidebar();
+            showTab('profile');
+          });
+        }
+      }
+
+      // 2. Hiển thị mục Admin nếu user có quyền
+      if (sidebarAdminItem) {
+        if (currentUser.role === 'admin') {
+          sidebarAdminItem.classList.remove('d-none');
+        } else {
+          sidebarAdminItem.classList.add('d-none');
+        }
+      }
+
+      // 3. Đổi nút "Đăng ký ngay" thành "Đăng xuất" màu đỏ cao cấp
+      if (sidebarAuthBtnZone) {
+        sidebarAuthBtnZone.innerHTML = `
+          <button class="btn w-100 sidebar-register-btn d-flex align-items-center justify-content-center gap-2 py-3 bg-danger" id="sidebarLogoutBtn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3) !important;">
+            <i class="bi bi-box-arrow-right fs-5"></i>
+            <span>Đăng xuất</span>
+          </button>
+        `;
+        const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+        if (sidebarLogoutBtn) {
+          sidebarLogoutBtn.addEventListener('click', () => {
+            closeSidebar();
+            window.QuizSession.clear();
+            renderAuthContext();
+            loadTopics();
+            goBackToHome();
+          });
+        }
+      }
+
     } else {
-      // Ẩn menu Thống kê & Lịch sử
+      // --- PHẦN LOGIC NAVBAR CŨ (Duy trì tính tương thích) ---
       if (mainNavLinks) mainNavLinks.style.display = 'none';
-      
-      // Chưa đăng nhập
       authContextZone.innerHTML = `
         <button class="btn btn-outline-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập</button>
         <button class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký</button>
       `;
+
+      // --- PHẦN LOGIC SIDEBAR MỚI (Mockup Design) ---
+      // 1. Reset mục Đăng nhập
+      if (sidebarLoginItem) {
+        sidebarLoginItem.innerHTML = `
+          <a class="nav-link sidebar-link d-flex align-items-center gap-3" href="#" id="sidebarLoginBtn">
+            <i class="bi bi-box-arrow-in-right fs-5 icon-orange"></i>
+            <span>Đăng nhập</span>
+          </a>
+        `;
+        const sidebarLoginBtn = document.getElementById('sidebarLoginBtn');
+        if (sidebarLoginBtn) {
+          sidebarLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeSidebar();
+            const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            loginModal.show();
+          });
+        }
+      }
+
+      // 2. Ẩn mục Admin
+      if (sidebarAdminItem) {
+        sidebarAdminItem.classList.add('d-none');
+      }
+
+      // 3. Reset nút Đăng ký ngay màu cam vàng
+      if (sidebarAuthBtnZone) {
+        sidebarAuthBtnZone.innerHTML = `
+          <button class="btn w-100 sidebar-register-btn d-flex align-items-center justify-content-center gap-2 py-3" id="sidebarRegisterBtn">
+            <i class="bi bi-person-plus fs-5"></i>
+            <span>Đăng ký ngay</span>
+          </button>
+        `;
+        const sidebarRegisterBtn = document.getElementById('sidebarRegisterBtn');
+        if (sidebarRegisterBtn) {
+          sidebarRegisterBtn.addEventListener('click', () => {
+            closeSidebar();
+            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            registerModal.show();
+          });
+        }
+      }
     }
   }
 
@@ -800,6 +893,117 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Lỗi tải bảng xếp hạng cao thủ:', err);
       leaderboardList.innerHTML = `<div class="text-center py-4 text-danger small">Lỗi tải dữ liệu bảng xếp hạng!</div>`;
     }
+  }
+
+  // Hàm ẩn Sidebar Offcanvas
+  function closeSidebar() {
+    const sidebarEl = document.getElementById('sidebarMenu');
+    if (sidebarEl) {
+      const bsOffcanvas = bootstrap.Offcanvas.getInstance(sidebarEl) || new bootstrap.Offcanvas(sidebarEl);
+      bsOffcanvas.hide();
+    }
+  }
+
+  // Đăng ký sự kiện cho Sidebar Offcanvas mới (QuizMaster Theme)
+  const sidebarTourBtn = document.getElementById('sidebarTourBtn');
+  if (sidebarTourBtn) {
+    sidebarTourBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Đặt trạng thái active
+      document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
+      sidebarTourBtn.classList.add('active');
+      
+      closeSidebar();
+      goBackToHome();
+    });
+  }
+
+  const sidebarDestBtn = document.getElementById('sidebarDestBtn');
+  if (sidebarDestBtn) {
+    sidebarDestBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Đặt trạng thái active
+      document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
+      sidebarDestBtn.classList.add('active');
+      
+      closeSidebar();
+      showTab('leaderboard');
+    });
+  }
+
+  const sidebarHomeBtn = document.getElementById('sidebarHomeBtn');
+  if (sidebarHomeBtn) {
+    sidebarHomeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeSidebar();
+      
+      const currentUser = window.QuizSession.get();
+      if (!currentUser) {
+        alert('Vui lòng đăng nhập để xem lịch sử làm bài và biểu đồ điểm số của bạn!');
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show();
+      } else {
+        showTab('profile');
+      }
+    });
+  }
+
+  // Đăng ký sự kiện cho các Mock Link thông tin bổ sung trong Sidebar
+  const mockLinks = [
+    { id: 'sidebarAboutBtn', name: 'Giới thiệu Khoa & Nhóm 3 (Về Chúng Tôi)' },
+    { id: 'sidebarBlogBtn', name: 'Tin tức Giáo dục & Tài liệu ôn thi (Blog)' },
+    { id: 'sidebarContactBtn', name: 'Hỗ trợ Kỹ thuật & Liên hệ (Liên Hệ)' }
+  ];
+
+  mockLinks.forEach(link => {
+    const el = document.getElementById(link.id);
+    if (el) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        document.querySelectorAll('.sidebar-link').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        
+        closeSidebar();
+        
+        // Thông báo mock cao cấp
+        alert(`🌟 Chào mừng bạn đến với mục: ${link.name}!\n\nHệ thống ôn thi trực tuyến QuizMaster đang tiến hành đồng bộ tài nguyên từ máy chủ FIT-DNU.\n\nCảm ơn bạn đã đồng hành cùng Nhóm 3 - FIT - DNU!`);
+      });
+    }
+  });
+
+  // Đăng ký sự kiện cho Chân trang (Footer)
+  const footerHomeBtn = document.getElementById('footerHomeBtn');
+  if (footerHomeBtn) {
+    footerHomeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      goBackToHome();
+    });
+  }
+
+  const footerLeaderboardBtn = document.getElementById('footerLeaderboardBtn');
+  if (footerLeaderboardBtn) {
+    footerLeaderboardBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      showTab('leaderboard');
+    });
+  }
+
+  const footerProfileBtn = document.getElementById('footerProfileBtn');
+  if (footerProfileBtn) {
+    footerProfileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const currentUser = window.QuizSession.get();
+      if (!currentUser) {
+        alert('Vui lòng đăng nhập để xem thông tin trang cá nhân và lịch sử luyện thi!');
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show();
+      } else {
+        showTab('profile');
+      }
+    });
   }
 
   // ==================== 6. TAB THỐNG KÊ & TRANG CÁ NHÂN (USER ACCOUNT DASHBOARD) ====================
